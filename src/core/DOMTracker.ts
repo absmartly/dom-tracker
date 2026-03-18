@@ -57,6 +57,16 @@ export class DOMTracker {
     this.elementScanner.scan();
     this.ruleEngine.bind();
 
+    if (config.defaults !== false) {
+      const { pageViews } = require('../trackers/page-views');
+      const { formTracker } = require('../trackers/forms');
+      const { sessionTracker } = require('../trackers/session');
+      for (const factory of [pageViews, formTracker, sessionTracker]) {
+        const t = factory();
+        if (!this.trackers.has(t.name)) this.registerTracker(t);
+      }
+    }
+
     for (const tracker of config.trackers ?? []) {
       this.registerTracker(tracker);
     }
