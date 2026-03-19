@@ -22,6 +22,12 @@ export class ElementScanner {
       const event = el.getAttribute('data-abs-track');
       if (!event) return;
 
+      const elAny = el as any;
+      if (!elAny.__absLastFired) elAny.__absLastFired = {};
+      const now = Date.now();
+      if (elAny.__absLastFired[event] && now - elAny.__absLastFired[event] < 500) return;
+      elAny.__absLastFired[event] = now;
+
       const props = parseDataAttributes(el);
       props.page_name = this.getPageName();
 
@@ -29,11 +35,13 @@ export class ElementScanner {
       this.emit(event, props);
     };
 
+    window.addEventListener('pointerdown', this.handler, true);
     window.addEventListener('click', this.handler, true);
   }
 
   destroy(): void {
     if (this.handler) {
+      window.removeEventListener('pointerdown', this.handler, true);
       window.removeEventListener('click', this.handler, true);
       this.handler = null;
     }

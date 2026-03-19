@@ -3,6 +3,8 @@ import { debugLog } from '../utils/debug';
 
 type DelegatedListener = { eventType: string; handler: EventListener };
 
+const CLICK_EVENTS = ['pointerdown', 'click'];
+
 export class RuleEngine {
   private readonly emit: EventHandler;
   private readonly getPageName: () => string;
@@ -32,29 +34,13 @@ export class RuleEngine {
     }
 
     for (const [eventType, rules] of rulesByEvent) {
-      const handler: EventListener = (e: Event) => {
-        const target = e.target as Element;
-        if (!target) return;
+      const handler = this.createHandler(rules);
+      const listenEvents = eventType === 'click' ? CLICK_EVENTS : [eventType];
 
-        for (const rule of rules) {
-          let matched: Element | null = null;
-          try {
-            matched = target.closest(rule.selector);
-          } catch {
-            continue;
-          }
-          if (!matched) continue;
-          if (matched.hasAttribute('data-abs-track')) continue;
-
-          const props: Record<string, unknown> = { ...rule.props, page_name: this.getPageName() };
-          debugLog(this.debug, 'RuleEngine emit', rule.event, props);
-          this.emit(rule.event, props);
-          return;
-        }
-      };
-
-      window.addEventListener(eventType, handler, true);
-      this.delegatedListeners.push({ eventType, handler });
+      for (const listenEvent of listenEvents) {
+        window.addEventListener(listenEvent, handler, true);
+        this.delegatedListeners.push({ eventType: listenEvent, handler });
+      }
     }
   }
 
@@ -68,5 +54,34 @@ export class RuleEngine {
       window.removeEventListener(eventType, handler, true);
     }
     this.delegatedListeners = [];
+  }
+
+  private createHandler(rules: TrackingRule[]): EventListener {
+    return (e: Event) => {
+      const target = e.target as Element;
+      if (!target) return;
+
+      for (const rule of rules) {
+        let matched: Element | null = null;
+        try {
+          matched = target.closest(rule.selector);
+        } catch {
+          continue;
+        }
+        if (!matched) continue;
+        if (matched.hasAttribute('data-abs-track')) continue;
+
+        const el = matched as any;
+        if (!el.__absLastFired) el.__absLastFired = {};
+        const now = Date.now();
+        if (el.__absLastFired[rule.event] && now - el.__absLastFired[rule.event] < 500) return;
+        el.__absLastFired[rule.event] = now;
+
+        const props: Record<string, unknown> = { ...rule.props, page_name: this.getPageName() };
+        debugLog(this.debug, 'RuleEngine emit', rule.event, props);
+        this.emit(rule.event, props);
+        return;
+      }
+    };
   }
 }
