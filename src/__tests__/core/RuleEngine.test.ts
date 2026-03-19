@@ -49,6 +49,10 @@ describe('RuleEngine', () => {
   it('does not throw for invalid selectors', () => {
     engine.addRule({ selector: '!!!invalid!!!', event: 'never' });
     expect(() => engine.bind()).not.toThrow();
+
+    document.body.innerHTML = '<button>Click</button>';
+    document.querySelector('button')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    expect(emit).not.toHaveBeenCalled();
   });
 
   it('does not fire after destroy', () => {
@@ -96,5 +100,27 @@ describe('RuleEngine', () => {
     buttons[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(emit).toHaveBeenCalledTimes(2);
+  });
+
+  it('tracks dynamically added elements via delegation', () => {
+    engine.addRule({ selector: '.dynamic-btn', event: 'dynamic_clicked' });
+    engine.bind();
+
+    const btn = document.createElement('button');
+    btn.className = 'dynamic-btn';
+    document.body.appendChild(btn);
+    btn.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(emit).toHaveBeenCalledWith('dynamic_clicked', { page_name: 'test-page' });
+  });
+
+  it('tracks clicks on child elements of matched selector', () => {
+    document.body.innerHTML = '<a class="cta" href="/demo"><span>Get Demo</span></a>';
+    engine.addRule({ selector: '.cta', event: 'cta_clicked' });
+    engine.bind();
+
+    document.querySelector('span')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(emit).toHaveBeenCalledWith('cta_clicked', { page_name: 'test-page' });
   });
 });

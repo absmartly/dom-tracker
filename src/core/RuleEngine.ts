@@ -1,14 +1,14 @@
 import { EventHandler, TrackingRule } from './types';
 import { debugLog } from '../utils/debug';
 
-type BoundListener = { el: Element; eventType: string; handler: EventListener };
+type DelegatedListener = { eventType: string; handler: EventListener };
 
 export class RuleEngine {
   private readonly emit: EventHandler;
   private readonly getPageName: () => string;
   private readonly debug: boolean;
   private rules: TrackingRule[] = [];
-  private listeners: BoundListener[] = [];
+  private delegatedListeners: DelegatedListener[] = [];
 
   constructor(emit: EventHandler, getPageName: () => string, debug: boolean) {
     this.emit = emit;
@@ -21,29 +21,40 @@ export class RuleEngine {
   }
 
   bind(): void {
+    this.destroy();
+
+    const rulesByEvent = new Map<string, TrackingRule[]>();
     for (const rule of this.rules) {
-      let elements: NodeListOf<Element>;
-      try {
-        elements = document.querySelectorAll(rule.selector);
-      } catch {
-        debugLog(this.debug, 'RuleEngine invalid selector', rule.selector);
-        continue;
-      }
-
       const eventType = rule.on ?? 'click';
+      const group = rulesByEvent.get(eventType) || [];
+      group.push(rule);
+      rulesByEvent.set(eventType, group);
+    }
 
-      for (const el of elements) {
-        if (el.hasAttribute('data-abs-track')) continue;
+    for (const [eventType, rules] of rulesByEvent) {
+      const handler: EventListener = (e: Event) => {
+        const target = e.target as Element;
+        if (!target) return;
 
-        const handler: EventListener = () => {
+        for (const rule of rules) {
+          let matched: Element | null = null;
+          try {
+            matched = target.closest(rule.selector);
+          } catch {
+            continue;
+          }
+          if (!matched) continue;
+          if (matched.hasAttribute('data-abs-track')) continue;
+
           const props: Record<string, unknown> = { ...rule.props, page_name: this.getPageName() };
           debugLog(this.debug, 'RuleEngine emit', rule.event, props);
           this.emit(rule.event, props);
-        };
+          return;
+        }
+      };
 
-        el.addEventListener(eventType, handler);
-        this.listeners.push({ el, eventType, handler });
-      }
+      document.addEventListener(eventType, handler, true);
+      this.delegatedListeners.push({ eventType, handler });
     }
   }
 
@@ -53,9 +64,9 @@ export class RuleEngine {
   }
 
   destroy(): void {
-    for (const { el, eventType, handler } of this.listeners) {
-      el.removeEventListener(eventType, handler);
+    for (const { eventType, handler } of this.delegatedListeners) {
+      document.removeEventListener(eventType, handler, true);
     }
-    this.listeners = [];
+    this.delegatedListeners = [];
   }
 }
