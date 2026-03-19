@@ -53,7 +53,7 @@ export class RuleEngine {
         }
       };
 
-      document.addEventListener(eventType, handler, true);
+      window.addEventListener(eventType, handler, true);
       this.delegatedListeners.push({ eventType, handler });
     }
   }
@@ -65,7 +65,7 @@ export class RuleEngine {
 
   destroy(): void {
     for (const { eventType, handler } of this.delegatedListeners) {
-      document.removeEventListener(eventType, handler, true);
+      window.removeEventListener(eventType, handler, true);
     }
     this.delegatedListeners = [];
   }

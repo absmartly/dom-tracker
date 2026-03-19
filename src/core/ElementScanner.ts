@@ -29,12 +29,12 @@ export class ElementScanner {
       this.emit(event, props);
     };
 
-    document.addEventListener('click', this.handler);
+    window.addEventListener('click', this.handler, true);
   }
 
   destroy(): void {
     if (this.handler) {
-      document.removeEventListener('click', this.handler);
+      window.removeEventListener('click', this.handler, true);
       this.handler = null;
     }
   }
