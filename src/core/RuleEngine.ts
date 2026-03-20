@@ -74,13 +74,12 @@ export class RuleEngine {
         const el = matched as any;
         if (!el.__absLastFired) el.__absLastFired = {};
         const now = Date.now();
-        if (el.__absLastFired[rule.event] && now - el.__absLastFired[rule.event] < 500) return;
+        if (el.__absLastFired[rule.event] && now - el.__absLastFired[rule.event] < 500) continue;
         el.__absLastFired[rule.event] = now;
 
         const props: Record<string, unknown> = { ...rule.props, page_name: this.getPageName() };
         debugLog(this.debug, 'RuleEngine emit', rule.event, props);
         this.emit(rule.event, props);
-        return;
       }
     };
   }
