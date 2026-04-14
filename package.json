@@ -78,6 +78,10 @@
     "test:coverage": "jest --coverage",
     "release": "bun run build"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/absmartly/dom-tracker"
+  },
   "keywords": [
     "analytics",
     "tracking",
