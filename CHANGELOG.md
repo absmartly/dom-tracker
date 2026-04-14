@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/absmartly/dom-tracker/compare/dom-tracker-v0.2.0...dom-tracker-v0.3.0) (2026-04-14)
+
+
+### Features
+
+* add tag-triggered release workflow for npm publishing ([f8e4b9c](https://github.com/absmartly/dom-tracker/commit/f8e4b9c7ffbec4259d6290fd6ada9aeec508f8aa))
+
 ## [0.2.0](https://github.com/absmartly/dom-tracker/compare/dom-tracker-v0.1.0...dom-tracker-v0.2.0) (2026-04-14)
 
 

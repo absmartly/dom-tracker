@@ -1,6 +1,6 @@
 {
   "name": "@absmartly/dom-tracker",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Standalone DOM analytics tracking library using data-attributes and selector rules",
   "main": "lib/index.js",
   "module": "es/index.js",
