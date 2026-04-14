@@ -1,4 +1,7 @@
-export type EventHandler = (event: string, props: Record<string, unknown>) => void;
+export type EventHandler = (
+  event: string,
+  props: Record<string, unknown>,
+) => void;
 export type AttributeHandler = (attrs: Record<string, unknown>) => void;
 
 export interface TrackingRule {
@@ -39,6 +42,9 @@ export interface TrackerContext {
   getConfig(): DOMTrackerConfig;
   querySelectorAll(selector: string): Element[];
   onElementAdded(selector: string, callback: (el: Element) => void): () => void;
-  onElementRemoved(selector: string, callback: (el: Element) => void): () => void;
+  onElementRemoved(
+    selector: string,
+    callback: (el: Element) => void,
+  ): () => void;
   getPageName(): string;
 }

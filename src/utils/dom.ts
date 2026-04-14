@@ -1,25 +1,25 @@
 export function getPageName(url: URL): string {
-  const path = url.pathname.replace(/\/+$/, '');
-  if (!path || path === '') {
-    return 'homepage';
+  const path = url.pathname.replace(/\/+$/, "");
+  if (!path || path === "") {
+    return "homepage";
   }
-  const segments = path.split('/');
+  const segments = path.split("/");
   return segments[segments.length - 1];
 }
 
 function coerceValue(value: string): unknown {
-  if (value === 'true') return true;
-  if (value === 'false') return false;
-  if (value !== '' && !isNaN(Number(value))) return Number(value);
+  if (value === "true") return true;
+  if (value === "false") return false;
+  if (value !== "" && !isNaN(Number(value))) return Number(value);
   return value;
 }
 
 function kebabToSnake(str: string): string {
-  return str.replace(/-/g, '_');
+  return str.replace(/-/g, "_");
 }
 
-const ABS_PREFIX = 'data-abs-';
-const TRACK_ATTR = 'data-abs-track';
+const ABS_PREFIX = "data-abs-";
+const TRACK_ATTR = "data-abs-track";
 
 export function parseDataAttributes(el: Element): Record<string, unknown> {
   const result: Record<string, unknown> = {};

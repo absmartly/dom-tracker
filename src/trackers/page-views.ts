@@ -1,11 +1,11 @@
-import { Tracker, TrackerContext } from '../core/types';
+import { Tracker, TrackerContext } from "../core/types";
 
 export function pageViews(): Tracker {
   let ctx: TrackerContext | null = null;
 
   function emitPageView(): void {
     if (!ctx) return;
-    ctx.emit('page_view', {
+    ctx.emit("page_view", {
       page_name: ctx.getPageName(),
       page_path: window.location.pathname,
       page_url: window.location.href,
@@ -14,7 +14,7 @@ export function pageViews(): Tracker {
   }
 
   return {
-    name: 'page-views',
+    name: "page-views",
 
     init(context: TrackerContext): void {
       ctx = context;

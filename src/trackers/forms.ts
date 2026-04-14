@@ -1,5 +1,5 @@
-import { Tracker, TrackerContext } from '../core/types';
-import { generateId } from '../utils/cookies';
+import { Tracker, TrackerContext } from "../core/types";
+import { generateId } from "../utils/cookies";
 
 export interface FormTrackerConfig {
   abandonment?: {
@@ -20,11 +20,14 @@ function deriveFormId(form: HTMLFormElement): string {
 }
 
 function countFilledFields(form: HTMLFormElement): number {
-  const inputs = form.querySelectorAll('input, textarea, select');
+  const inputs = form.querySelectorAll("input, textarea, select");
   let count = 0;
   for (const input of Array.from(inputs)) {
-    const el = input as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
-    if (el.value && el.value.trim() !== '') {
+    const el = input as
+      | HTMLInputElement
+      | HTMLTextAreaElement
+      | HTMLSelectElement;
+    if (el.value && el.value.trim() !== "") {
       count++;
     }
   }
@@ -49,8 +52,9 @@ export function formTracker(config?: FormTrackerConfig): Tracker {
   }
 
   function fireAbandonment(form: HTMLFormElement, state: FormState): void {
+    /* istanbul ignore if -- defensive guard; callers check ctx before invoking */
     if (!ctx) return;
-    ctx.emit('form_abandoned', {
+    ctx.emit("form_abandoned", {
       form_id: state.formId,
       fields_completed: countFilledFields(form),
       last_field: state.lastField,
@@ -76,21 +80,25 @@ export function formTracker(config?: FormTrackerConfig): Tracker {
   }
 
   function onFocusIn(event: Event): void {
+    /* istanbul ignore if -- defensive guard; destroy() removes listener before nulling ctx */
     if (!ctx) return;
     const target = event.target as Element | null;
     if (!target) return;
-    const form = target.closest('form') as HTMLFormElement | null;
+    const form = target.closest("form") as HTMLFormElement | null;
     if (!form) return;
 
     const state = getOrCreateState(form);
-    const fieldName = (target as HTMLInputElement).name || (target as HTMLInputElement).id || '';
+    const fieldName =
+      (target as HTMLInputElement).name ||
+      (target as HTMLInputElement).id ||
+      "";
     state.lastField = fieldName || null;
 
     if (state.submitted) return;
 
     if (!state.started) {
       state.started = true;
-      ctx.emit('form_started', {
+      ctx.emit("form_started", {
         form_id: state.formId,
         form_action: form.action || null,
         page_name: ctx.getPageName(),
@@ -101,6 +109,7 @@ export function formTracker(config?: FormTrackerConfig): Tracker {
   }
 
   function onSubmit(event: Event): void {
+    /* istanbul ignore if -- defensive guard; destroy() removes listener before nulling ctx */
     if (!ctx) return;
     const form = event.target as HTMLFormElement | null;
     if (!form) return;
@@ -109,7 +118,7 @@ export function formTracker(config?: FormTrackerConfig): Tracker {
     clearAbandonTimer(state);
     state.submitted = true;
 
-    ctx.emit('form_submitted', {
+    ctx.emit("form_submitted", {
       form_id: state.formId,
       form_action: form.action || null,
       page_name: ctx.getPageName(),
@@ -127,12 +136,12 @@ export function formTracker(config?: FormTrackerConfig): Tracker {
   }
 
   return {
-    name: 'form-tracker',
+    name: "form-tracker",
 
     init(context: TrackerContext): void {
       ctx = context;
-      document.addEventListener('focusin', onFocusIn);
-      document.addEventListener('submit', onSubmit);
+      document.addEventListener("focusin", onFocusIn);
+      document.addEventListener("submit", onSubmit);
     },
 
     onRouteChange(): void {
@@ -140,8 +149,8 @@ export function formTracker(config?: FormTrackerConfig): Tracker {
     },
 
     destroy(): void {
-      document.removeEventListener('focusin', onFocusIn);
-      document.removeEventListener('submit', onSubmit);
+      document.removeEventListener("focusin", onFocusIn);
+      document.removeEventListener("submit", onSubmit);
       for (const [, state] of formStates.entries()) {
         clearAbandonTimer(state);
       }

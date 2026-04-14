@@ -5,3 +5,4 @@ dist/
 types/
 coverage/
 *.js.map
+package-lock.json
