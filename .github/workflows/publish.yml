@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     permissions:
-      id-token: write
       contents: write
 
     steps:
@@ -65,7 +64,9 @@ jobs:
         run: bun run build
 
       - name: Publish
-        run: npm publish --provenance --access public
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Push version bump
         run: git push --follow-tags
