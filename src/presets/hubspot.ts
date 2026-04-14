@@ -1,4 +1,4 @@
-import type { Preset, TrackerContext } from '../core/types';
+import type { Preset, TrackerContext } from "../core/types";
 
 export interface HubSpotFormsConfig {
   abandonment?: {
@@ -15,17 +15,21 @@ interface HsFormState {
 export function hubspotForms(config?: HubSpotFormsConfig): Preset {
   return {
     rules: [
-      { selector: '.hs-input', event: 'form_field_focused', on: 'focus' },
+      { selector: ".hs-input", event: "form_field_focused", on: "focus" },
     ],
     tracker: {
-      name: 'hubspot-forms',
+      name: "hubspot-forms",
 
       init(ctx: TrackerContext): void {
         const formStates = new Map<Element, HsFormState>();
 
         function getOrCreate(form: Element): HsFormState {
           if (!formStates.has(form)) {
-            formStates.set(form, { started: false, submitted: false, abandonTimer: null });
+            formStates.set(form, {
+              started: false,
+              submitted: false,
+              abandonTimer: null,
+            });
           }
           return formStates.get(form)!;
         }
@@ -38,8 +42,8 @@ export function hubspotForms(config?: HubSpotFormsConfig): Preset {
         }
 
         function fireAbandonment(_form: Element): void {
-          ctx.emit('form_abandoned', {
-            form_type: 'hubspot',
+          ctx.emit("form_abandoned", {
+            form_type: "hubspot",
             page_name: ctx.getPageName(),
           });
         }
@@ -54,26 +58,26 @@ export function hubspotForms(config?: HubSpotFormsConfig): Preset {
           }, config.abandonment.timeout);
         }
 
-        ctx.onElementAdded('form.hs-form', (form) => {
+        ctx.onElementAdded("form.hs-form", (form) => {
           const state = getOrCreate(form);
 
-          form.addEventListener('focusin', () => {
+          form.addEventListener("focusin", () => {
             if (state.submitted) return;
             if (!state.started) {
               state.started = true;
-              ctx.emit('form_started', {
-                form_type: 'hubspot',
+              ctx.emit("form_started", {
+                form_type: "hubspot",
                 page_name: ctx.getPageName(),
               });
             }
             startAbandonTimer(form, state);
           });
 
-          form.addEventListener('submit', () => {
+          form.addEventListener("submit", () => {
             clearTimer(state);
             state.submitted = true;
-            ctx.emit('form_submitted', {
-              form_type: 'hubspot',
+            ctx.emit("form_submitted", {
+              form_type: "hubspot",
               page_name: ctx.getPageName(),
             });
           });

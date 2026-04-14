@@ -1,4 +1,4 @@
-import { Tracker, TrackerContext } from '../core/types';
+import { Tracker, TrackerContext } from "../core/types";
 
 const DEFAULT_THRESHOLDS = [10, 30, 60, 180];
 
@@ -21,19 +21,26 @@ export function timeOnPage(config?: TimeOnPageConfig): Tracker {
   let intervalId: ReturnType<typeof setInterval> | null = null;
 
   function onVisibilityChange(): void {
+    /* istanbul ignore if -- defensive guard; destroy() removes listener before nulling ctx */
     if (!ctx) return;
-    if (document.visibilityState === 'hidden') {
+    if (document.visibilityState === "hidden") {
       paused = true;
       hiddenAt = elapsed;
       if (trackVisibilityEvents) {
-        ctx.emit('tab_hidden', { page_name: ctx.getPageName(), time_on_page: elapsed });
+        ctx.emit("tab_hidden", {
+          page_name: ctx.getPageName(),
+          time_on_page: elapsed,
+        });
       }
     } else {
       const hiddenDuration = hiddenAt !== null ? elapsed - hiddenAt : 0;
       paused = false;
       hiddenAt = null;
       if (trackVisibilityEvents) {
-        ctx.emit('tab_visible', { page_name: ctx.getPageName(), hidden_duration: hiddenDuration });
+        ctx.emit("tab_visible", {
+          page_name: ctx.getPageName(),
+          hidden_duration: hiddenDuration,
+        });
       }
     }
   }
@@ -45,7 +52,10 @@ export function timeOnPage(config?: TimeOnPageConfig): Tracker {
       for (const threshold of thresholds) {
         if (elapsed >= threshold && !fired.has(threshold)) {
           fired.add(threshold);
-          ctx.emit('time_on_page', { seconds: threshold, page_name: ctx.getPageName() });
+          ctx.emit("time_on_page", {
+            seconds: threshold,
+            page_name: ctx.getPageName(),
+          });
         }
       }
     }, 1000);
@@ -57,12 +67,12 @@ export function timeOnPage(config?: TimeOnPageConfig): Tracker {
   }
 
   return {
-    name: 'time-on-page',
+    name: "time-on-page",
 
     init(context: TrackerContext): void {
       ctx = context;
       startInterval();
-      document.addEventListener('visibilitychange', onVisibilityChange);
+      document.addEventListener("visibilitychange", onVisibilityChange);
     },
 
     onRouteChange(): void {
@@ -74,7 +84,7 @@ export function timeOnPage(config?: TimeOnPageConfig): Tracker {
         clearInterval(intervalId);
         intervalId = null;
       }
-      document.removeEventListener('visibilitychange', onVisibilityChange);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
       ctx = null;
     },
   };

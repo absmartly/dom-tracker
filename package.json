@@ -20,17 +20,18 @@
   "scripts": {
     "clean": "rm -rf lib es dist types",
     "format": "prettier --write \"src/**/*.{js,ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{js,ts,tsx}\"",
     "lint": "eslint src --ext .ts,.tsx",
     "compile:cjs": "tsc -p tsconfig.cjs.json",
     "compile:es": "tsc -p tsconfig.es.json",
     "compile:types": "tsc -p tsconfig.types.json",
-    "compile": "npm run compile:cjs && npm run compile:es && npm run compile:types",
+    "compile": "bun run compile:cjs && bun run compile:es && bun run compile:types",
     "bundle": "webpack --mode production --env BUILD_TYPE=all",
-    "build": "npm run clean && npm run format && npm run lint && npm run compile && npm run bundle",
+    "build": "bun run clean && bun run format && bun run lint && bun run compile && bun run bundle",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "release": "npm run build && npm publish --access public"
+    "release": "bun run build && npm publish --provenance --access public"
   },
   "keywords": ["analytics", "tracking", "dom", "data-attributes", "events"],
   "author": "ABsmartly",

@@ -1,4 +1,4 @@
-import { debugLog } from '../utils/debug';
+import { debugLog } from "../utils/debug";
 
 type RouteChangeHandler = (url: string, prevUrl: string) => void;
 type MutationHandler = (mutations: MutationRecord[]) => void;
@@ -13,7 +13,7 @@ interface SPAObserverConfig {
 interface ElementSubscription {
   selector: string;
   callback: ElementCallback;
-  type: 'added' | 'removed';
+  type: "added" | "removed";
 }
 
 export class SPAObserver {
@@ -24,7 +24,9 @@ export class SPAObserver {
   private originalReplaceState: typeof history.replaceState | null = null;
   private popstateHandler: (() => void) | null = null;
   private hashchangeHandler: (() => void) | null = null;
-  private currentUrl: string = typeof window !== 'undefined' ? window.location.href : '';
+  private currentUrl: string =
+    /* istanbul ignore next -- window is always defined in browser; SSR guard */
+    typeof window !== "undefined" ? window.location.href : "";
 
   constructor(config: SPAObserverConfig) {
     this.config = config;
@@ -40,11 +42,11 @@ export class SPAObserver {
     this.restoreHistory();
 
     if (this.popstateHandler) {
-      window.removeEventListener('popstate', this.popstateHandler);
+      window.removeEventListener("popstate", this.popstateHandler);
       this.popstateHandler = null;
     }
     if (this.hashchangeHandler) {
-      window.removeEventListener('hashchange', this.hashchangeHandler);
+      window.removeEventListener("hashchange", this.hashchangeHandler);
       this.hashchangeHandler = null;
     }
 
@@ -57,7 +59,7 @@ export class SPAObserver {
   }
 
   onElementAdded(selector: string, callback: ElementCallback): () => void {
-    const sub: ElementSubscription = { selector, callback, type: 'added' };
+    const sub: ElementSubscription = { selector, callback, type: "added" };
     this.subscriptions.push(sub);
 
     try {
@@ -66,7 +68,11 @@ export class SPAObserver {
         callback(el);
       }
     } catch {
-      debugLog(this.config.debug ?? false, 'SPAObserver invalid selector', selector);
+      debugLog(
+        this.config.debug ?? false,
+        "SPAObserver invalid selector",
+        selector,
+      );
     }
 
     return () => {
@@ -75,7 +81,7 @@ export class SPAObserver {
   }
 
   onElementRemoved(selector: string, callback: ElementCallback): () => void {
-    const sub: ElementSubscription = { selector, callback, type: 'removed' };
+    const sub: ElementSubscription = { selector, callback, type: "removed" };
     this.subscriptions.push(sub);
 
     return () => {
@@ -93,7 +99,11 @@ export class SPAObserver {
       const prev = self.currentUrl;
       self.originalPushState!.apply(history, args);
       self.currentUrl = window.location.href;
-      debugLog(self.config.debug ?? false, 'SPAObserver pushState', self.currentUrl);
+      debugLog(
+        self.config.debug ?? false,
+        "SPAObserver pushState",
+        self.currentUrl,
+      );
       self.config.onRouteChange?.(self.currentUrl, prev);
     };
 
@@ -101,7 +111,11 @@ export class SPAObserver {
       const prev = self.currentUrl;
       self.originalReplaceState!.apply(history, args);
       self.currentUrl = window.location.href;
-      debugLog(self.config.debug ?? false, 'SPAObserver replaceState', self.currentUrl);
+      debugLog(
+        self.config.debug ?? false,
+        "SPAObserver replaceState",
+        self.currentUrl,
+      );
       self.config.onRouteChange?.(self.currentUrl, prev);
     };
   }
@@ -130,8 +144,8 @@ export class SPAObserver {
       this.config.onRouteChange?.(this.currentUrl, prev);
     };
 
-    window.addEventListener('popstate', this.popstateHandler);
-    window.addEventListener('hashchange', this.hashchangeHandler);
+    window.addEventListener("popstate", this.popstateHandler);
+    window.addEventListener("hashchange", this.hashchangeHandler);
   }
 
   private startMutationObserver(): void {
@@ -141,7 +155,10 @@ export class SPAObserver {
     });
 
     if (document.body) {
-      this.mutationObserver.observe(document.body, { childList: true, subtree: true });
+      this.mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
     }
   }
 
@@ -151,7 +168,7 @@ export class SPAObserver {
         if (node.nodeType !== Node.ELEMENT_NODE) continue;
         const el = node as Element;
         for (const sub of this.subscriptions) {
-          if (sub.type !== 'added') continue;
+          if (sub.type !== "added") continue;
           try {
             if (el.matches(sub.selector)) {
               sub.callback(el);
@@ -161,7 +178,11 @@ export class SPAObserver {
               sub.callback(desc);
             }
           } catch {
-            debugLog(this.config.debug ?? false, 'SPAObserver invalid selector', sub.selector);
+            debugLog(
+              this.config.debug ?? false,
+              "SPAObserver invalid selector",
+              sub.selector,
+            );
           }
         }
       }
@@ -170,13 +191,17 @@ export class SPAObserver {
         if (node.nodeType !== Node.ELEMENT_NODE) continue;
         const el = node as Element;
         for (const sub of this.subscriptions) {
-          if (sub.type !== 'removed') continue;
+          if (sub.type !== "removed") continue;
           try {
             if (el.matches(sub.selector)) {
               sub.callback(el);
             }
           } catch {
-            debugLog(this.config.debug ?? false, 'SPAObserver invalid selector', sub.selector);
+            debugLog(
+              this.config.debug ?? false,
+              "SPAObserver invalid selector",
+              sub.selector,
+            );
           }
         }
       }

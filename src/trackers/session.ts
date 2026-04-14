@@ -1,8 +1,14 @@
-import { Tracker, TrackerContext } from '../core/types';
-import { getCookie, setCookie, generateId, isLocalStorageAvailable, isSessionStorageAvailable } from '../utils/cookies';
+import { Tracker, TrackerContext } from "../core/types";
+import {
+  getCookie,
+  setCookie,
+  generateId,
+  isLocalStorageAvailable,
+  isSessionStorageAvailable,
+} from "../utils/cookies";
 
-const VISITOR_COOKIE = '_abs_visitor';
-const SESSION_COOKIE = '_abs_session';
+const VISITOR_COOKIE = "_abs_visitor";
+const SESSION_COOKIE = "_abs_session";
 const VISITOR_DAYS = 365;
 const SESSION_DAYS = 1;
 
@@ -12,7 +18,13 @@ export interface SessionTrackerConfig {
 
 function extractUtmParams(url: URL): Record<string, string> {
   const params: Record<string, string> = {};
-  const utmKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+  const utmKeys = [
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "utm_term",
+    "utm_content",
+  ];
   for (const key of utmKeys) {
     const value = url.searchParams.get(key);
     if (value) {
@@ -23,29 +35,39 @@ function extractUtmParams(url: URL): Record<string, string> {
 }
 
 function detectTrafficSource(referrer: string): string {
-  if (!referrer) return 'direct';
+  if (!referrer) return "direct";
   try {
     const ref = new URL(referrer);
     const host = ref.hostname;
-    if (/google\.|bing\.|yahoo\.|duckduckgo\.|baidu\./.test(host)) return 'organic';
-    if (/facebook\.|instagram\.|twitter\.|linkedin\.|tiktok\.|pinterest\./.test(host)) return 'social';
-    return 'referral';
+    if (/google\.|bing\.|yahoo\.|duckduckgo\.|baidu\./.test(host))
+      return "organic";
+    if (
+      /facebook\.|instagram\.|twitter\.|linkedin\.|tiktok\.|pinterest\./.test(
+        host,
+      )
+    )
+      return "social";
+    return "referral";
   } catch {
-    return 'direct';
+    return "direct";
   }
 }
 
 function detectDevice(): string {
   const ua = navigator.userAgent;
-  if (/tablet|ipad/i.test(ua)) return 'tablet';
-  if (/mobile|android|iphone/i.test(ua)) return 'mobile';
-  return 'desktop';
+  if (/tablet|ipad/i.test(ua)) return "tablet";
+  if (/mobile|android|iphone/i.test(ua)) return "mobile";
+  return "desktop";
 }
 
 function getVisitorId(domain?: string): { id: string; returning: boolean } {
   const existing = getCookie(VISITOR_COOKIE);
   if (existing) {
-    setCookie(VISITOR_COOKIE, existing, { days: VISITOR_DAYS, path: '/', domain });
+    setCookie(VISITOR_COOKIE, existing, {
+      days: VISITOR_DAYS,
+      path: "/",
+      domain,
+    });
     return { id: existing, returning: true };
   }
 
@@ -53,7 +75,11 @@ function getVisitorId(domain?: string): { id: string; returning: boolean } {
     const stored = window.localStorage.getItem(VISITOR_COOKIE);
     if (stored) {
       try {
-        setCookie(VISITOR_COOKIE, stored, { days: VISITOR_DAYS, path: '/', domain });
+        setCookie(VISITOR_COOKIE, stored, {
+          days: VISITOR_DAYS,
+          path: "/",
+          domain,
+        });
       } catch {}
       return { id: stored, returning: true };
     }
@@ -61,7 +87,7 @@ function getVisitorId(domain?: string): { id: string; returning: boolean } {
 
   const id = generateId();
   try {
-    setCookie(VISITOR_COOKIE, id, { days: VISITOR_DAYS, path: '/', domain });
+    setCookie(VISITOR_COOKIE, id, { days: VISITOR_DAYS, path: "/", domain });
   } catch {}
   if (isLocalStorageAvailable()) {
     try {
@@ -74,7 +100,11 @@ function getVisitorId(domain?: string): { id: string; returning: boolean } {
 function getSessionId(domain?: string): { id: string; isNew: boolean } {
   const existing = getCookie(SESSION_COOKIE);
   if (existing) {
-    setCookie(SESSION_COOKIE, existing, { days: SESSION_DAYS, path: '/', domain });
+    setCookie(SESSION_COOKIE, existing, {
+      days: SESSION_DAYS,
+      path: "/",
+      domain,
+    });
     return { id: existing, isNew: false };
   }
 
@@ -82,7 +112,11 @@ function getSessionId(domain?: string): { id: string; isNew: boolean } {
     const stored = window.sessionStorage.getItem(SESSION_COOKIE);
     if (stored) {
       try {
-        setCookie(SESSION_COOKIE, stored, { days: SESSION_DAYS, path: '/', domain });
+        setCookie(SESSION_COOKIE, stored, {
+          days: SESSION_DAYS,
+          path: "/",
+          domain,
+        });
       } catch {}
       return { id: stored, isNew: false };
     }
@@ -90,7 +124,7 @@ function getSessionId(domain?: string): { id: string; isNew: boolean } {
 
   const id = generateId();
   try {
-    setCookie(SESSION_COOKIE, id, { days: SESSION_DAYS, path: '/', domain });
+    setCookie(SESSION_COOKIE, id, { days: SESSION_DAYS, path: "/", domain });
   } catch {}
   if (isSessionStorageAvailable()) {
     try {
@@ -104,7 +138,7 @@ export function sessionTracker(config?: SessionTrackerConfig): Tracker {
   let ctx: TrackerContext | null = null;
 
   return {
-    name: 'session',
+    name: "session",
 
     init(context: TrackerContext): void {
       ctx = context;
@@ -118,7 +152,7 @@ export function sessionTracker(config?: SessionTrackerConfig): Tracker {
       const url = new URL(window.location.href);
       const utmParams = extractUtmParams(url);
       const trafficSource = utmParams.utm_source
-        ? 'paid'
+        ? "paid"
         : detectTrafficSource(document.referrer);
       const device = detectDevice();
 
@@ -131,7 +165,7 @@ export function sessionTracker(config?: SessionTrackerConfig): Tracker {
 
       ctx.setAttributes(attributes);
 
-      ctx.emit('session_start', {
+      ctx.emit("session_start", {
         session_id: sessionId,
         landing_page: window.location.pathname,
         referrer: document.referrer,

@@ -1,14 +1,23 @@
-import { DOMTrackerConfig, Tracker, TrackerContext, TrackingRule } from './types';
-import { ElementScanner } from './ElementScanner';
-import { RuleEngine } from './RuleEngine';
-import { SPAObserver } from './SPAObserver';
-import { debugLog } from '../utils/debug';
-import { getPageName as defaultGetPageName } from '../utils/dom';
+import {
+  DOMTrackerConfig,
+  Tracker,
+  TrackerContext,
+  TrackingRule,
+} from "./types";
+import { ElementScanner } from "./ElementScanner";
+import { RuleEngine } from "./RuleEngine";
+import { SPAObserver } from "./SPAObserver";
+import { debugLog } from "../utils/debug";
+import { getPageName as defaultGetPageName } from "../utils/dom";
 
 export class DOMTracker {
   private readonly config: DOMTrackerConfig;
-  private readonly onEventHandlers: Array<(event: string, props: Record<string, unknown>) => void> = [];
-  private readonly onAttributeHandlers: Array<(attrs: Record<string, unknown>) => void> = [];
+  private readonly onEventHandlers: Array<
+    (event: string, props: Record<string, unknown>) => void
+  > = [];
+  private readonly onAttributeHandlers: Array<
+    (attrs: Record<string, unknown>) => void
+  > = [];
   private readonly trackers: Map<string, Tracker> = new Map();
   private elementScanner: ElementScanner | null = null;
   private ruleEngine: RuleEngine | null = null;
@@ -18,9 +27,11 @@ export class DOMTracker {
   constructor(config: DOMTrackerConfig) {
     this.config = config;
 
-    if (typeof window === 'undefined') return;
+    if (typeof window === "undefined") return;
 
-    const eventHandlers = Array.isArray(config.onEvent) ? config.onEvent : [config.onEvent];
+    const eventHandlers = Array.isArray(config.onEvent)
+      ? config.onEvent
+      : [config.onEvent];
     this.onEventHandlers.push(...eventHandlers);
     const attrHandlers = config.onAttribute
       ? Array.isArray(config.onAttribute)
@@ -29,8 +40,16 @@ export class DOMTracker {
       : [];
     this.onAttributeHandlers.push(...attrHandlers);
 
-    this.elementScanner = new ElementScanner(this.emit.bind(this), this.getPageName.bind(this), config.debug ?? false);
-    this.ruleEngine = new RuleEngine(this.emit.bind(this), this.getPageName.bind(this), config.debug ?? false);
+    this.elementScanner = new ElementScanner(
+      this.emit.bind(this),
+      this.getPageName.bind(this),
+      config.debug ?? false,
+    );
+    this.ruleEngine = new RuleEngine(
+      this.emit.bind(this),
+      this.getPageName.bind(this),
+      config.debug ?? false,
+    );
 
     for (const rule of config.rules ?? []) {
       this.ruleEngine.addRule(rule);
@@ -58,9 +77,9 @@ export class DOMTracker {
     this.ruleEngine.bind();
 
     if (config.defaults !== false) {
-      const { pageViews } = require('../trackers/page-views');
-      const { formTracker } = require('../trackers/forms');
-      const { sessionTracker } = require('../trackers/session');
+      const { pageViews } = require("../trackers/page-views");
+      const { formTracker } = require("../trackers/forms");
+      const { sessionTracker } = require("../trackers/session");
       for (const factory of [pageViews, formTracker, sessionTracker]) {
         const t = factory();
         if (!this.trackers.has(t.name)) this.registerTracker(t);
@@ -77,7 +96,7 @@ export class DOMTracker {
       try {
         handler(event, props);
       } catch (err) {
-        debugLog(this.config.debug ?? false, 'onEvent handler error', err);
+        debugLog(this.config.debug ?? false, "onEvent handler error", err);
       }
     }
   }
@@ -87,7 +106,7 @@ export class DOMTracker {
       try {
         handler(attrs);
       } catch (err) {
-        debugLog(this.config.debug ?? false, 'onAttribute handler error', err);
+        debugLog(this.config.debug ?? false, "onAttribute handler error", err);
       }
     }
   }
@@ -127,7 +146,12 @@ export class DOMTracker {
     try {
       tracker.init(ctx);
     } catch (err) {
-      debugLog(this.config.debug ?? false, 'tracker init error', tracker.name, err);
+      debugLog(
+        this.config.debug ?? false,
+        "tracker init error",
+        tracker.name,
+        err,
+      );
     }
   }
 
@@ -135,7 +159,12 @@ export class DOMTracker {
     try {
       tracker.destroy();
     } catch (err) {
-      debugLog(this.config.debug ?? false, 'tracker destroy error', tracker.name, err);
+      debugLog(
+        this.config.debug ?? false,
+        "tracker destroy error",
+        tracker.name,
+        err,
+      );
     }
   }
 
@@ -145,10 +174,16 @@ export class DOMTracker {
         try {
           tracker.onRouteChange(url, prevUrl);
         } catch (err) {
-          debugLog(this.config.debug ?? false, 'tracker onRouteChange error', tracker.name, err);
+          debugLog(
+            this.config.debug ?? false,
+            "tracker onRouteChange error",
+            tracker.name,
+            err,
+          );
         }
       }
     }
+    /* istanbul ignore next -- ruleEngine is always set when SPA observer is active */
     this.ruleEngine?.rebind();
   }
 
@@ -158,7 +193,12 @@ export class DOMTracker {
         try {
           tracker.onDOMMutation(mutations);
         } catch (err) {
-          debugLog(this.config.debug ?? false, 'tracker onDOMMutation error', tracker.name, err);
+          debugLog(
+            this.config.debug ?? false,
+            "tracker onDOMMutation error",
+            tracker.name,
+            err,
+          );
         }
       }
     }
