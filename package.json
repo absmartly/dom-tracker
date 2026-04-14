@@ -1,22 +1,67 @@
 {
   "name": "@absmartly/dom-tracker",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Standalone DOM analytics tracking library using data-attributes and selector rules",
   "main": "lib/index.js",
   "module": "es/index.js",
   "browser": "dist/dom-tracker.min.js",
   "types": "types/index.d.ts",
   "exports": {
-    ".": { "source": "./src/index.ts", "types": "./types/index.d.ts", "import": "./es/index.js", "require": "./lib/index.js" },
-    "./trackers/page-views": { "source": "./src/trackers/page-views.ts", "types": "./types/trackers/page-views.d.ts", "import": "./es/trackers/page-views.js", "require": "./lib/trackers/page-views.js" },
-    "./trackers/scroll": { "source": "./src/trackers/scroll.ts", "types": "./types/trackers/scroll.d.ts", "import": "./es/trackers/scroll.js", "require": "./lib/trackers/scroll.js" },
-    "./trackers/time": { "source": "./src/trackers/time.ts", "types": "./types/trackers/time.d.ts", "import": "./es/trackers/time.js", "require": "./lib/trackers/time.js" },
-    "./trackers/forms": { "source": "./src/trackers/forms.ts", "types": "./types/trackers/forms.d.ts", "import": "./es/trackers/forms.js", "require": "./lib/trackers/forms.js" },
-    "./trackers/session": { "source": "./src/trackers/session.ts", "types": "./types/trackers/session.d.ts", "import": "./es/trackers/session.js", "require": "./lib/trackers/session.js" },
-    "./presets": { "source": "./src/presets/index.ts", "types": "./types/presets/index.d.ts", "import": "./es/presets/index.js", "require": "./lib/presets/index.js" },
-    "./presets/hubspot": { "source": "./src/presets/hubspot.ts", "types": "./types/presets/hubspot.d.ts", "import": "./es/presets/hubspot.js", "require": "./lib/presets/hubspot.js" }
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./types/index.d.ts",
+      "import": "./es/index.js",
+      "require": "./lib/index.js"
+    },
+    "./trackers/page-views": {
+      "source": "./src/trackers/page-views.ts",
+      "types": "./types/trackers/page-views.d.ts",
+      "import": "./es/trackers/page-views.js",
+      "require": "./lib/trackers/page-views.js"
+    },
+    "./trackers/scroll": {
+      "source": "./src/trackers/scroll.ts",
+      "types": "./types/trackers/scroll.d.ts",
+      "import": "./es/trackers/scroll.js",
+      "require": "./lib/trackers/scroll.js"
+    },
+    "./trackers/time": {
+      "source": "./src/trackers/time.ts",
+      "types": "./types/trackers/time.d.ts",
+      "import": "./es/trackers/time.js",
+      "require": "./lib/trackers/time.js"
+    },
+    "./trackers/forms": {
+      "source": "./src/trackers/forms.ts",
+      "types": "./types/trackers/forms.d.ts",
+      "import": "./es/trackers/forms.js",
+      "require": "./lib/trackers/forms.js"
+    },
+    "./trackers/session": {
+      "source": "./src/trackers/session.ts",
+      "types": "./types/trackers/session.d.ts",
+      "import": "./es/trackers/session.js",
+      "require": "./lib/trackers/session.js"
+    },
+    "./presets": {
+      "source": "./src/presets/index.ts",
+      "types": "./types/presets/index.d.ts",
+      "import": "./es/presets/index.js",
+      "require": "./lib/presets/index.js"
+    },
+    "./presets/hubspot": {
+      "source": "./src/presets/hubspot.ts",
+      "types": "./types/presets/hubspot.d.ts",
+      "import": "./es/presets/hubspot.js",
+      "require": "./lib/presets/hubspot.js"
+    }
   },
-  "files": ["lib", "es", "dist", "types"],
+  "files": [
+    "lib",
+    "es",
+    "dist",
+    "types"
+  ],
   "scripts": {
     "clean": "rm -rf lib es dist types",
     "format": "prettier --write \"src/**/*.{js,ts,tsx}\"",
@@ -33,7 +78,13 @@
     "test:coverage": "jest --coverage",
     "release": "bun run build"
   },
-  "keywords": ["analytics", "tracking", "dom", "data-attributes", "events"],
+  "keywords": [
+    "analytics",
+    "tracking",
+    "dom",
+    "data-attributes",
+    "events"
+  ],
   "author": "ABsmartly",
   "license": "MIT",
   "devDependencies": {
