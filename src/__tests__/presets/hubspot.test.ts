@@ -112,9 +112,7 @@ describe("hubspotForms", () => {
     // postMessage is async — wait a tick
     await new Promise((r) => setTimeout(r, 0));
 
-    const submittedEvents = emitted.filter(
-      (e) => e.event === "form_submitted",
-    );
+    const submittedEvents = emitted.filter((e) => e.event === "form_submitted");
     expect(submittedEvents).toHaveLength(1);
     expect(submittedEvents[0].props.form_type).toBe("hubspot");
     expect(submittedEvents[0].props.form_id).toBe("guid-abc");
@@ -137,9 +135,7 @@ describe("hubspotForms", () => {
 
     form.dispatchEvent(new Event("submit", { bubbles: true }));
 
-    const submittedEvents = emitted.filter(
-      (e) => e.event === "form_submitted",
-    );
+    const submittedEvents = emitted.filter((e) => e.event === "form_submitted");
     expect(submittedEvents).toHaveLength(0);
 
     preset.tracker!.destroy();
@@ -157,9 +153,7 @@ describe("hubspotForms", () => {
 
     await new Promise((r) => setTimeout(r, 0));
 
-    const submittedEvents = emitted.filter(
-      (e) => e.event === "form_submitted",
-    );
+    const submittedEvents = emitted.filter((e) => e.event === "form_submitted");
     expect(submittedEvents).toHaveLength(0);
 
     preset.tracker!.destroy();
@@ -180,9 +174,7 @@ describe("hubspotForms", () => {
     form.dispatchEvent(new Event("focusin", { bubbles: true }));
     jest.advanceTimersByTime(5000);
 
-    const abandonedEvents = emitted.filter(
-      (e) => e.event === "form_abandoned",
-    );
+    const abandonedEvents = emitted.filter((e) => e.event === "form_abandoned");
     expect(abandonedEvents).toHaveLength(1);
     expect(abandonedEvents[0].props.form_type).toBe("hubspot");
 
@@ -213,9 +205,7 @@ describe("hubspotForms", () => {
 
     jest.advanceTimersByTime(5000);
 
-    const abandonedEvents = emitted.filter(
-      (e) => e.event === "form_abandoned",
-    );
+    const abandonedEvents = emitted.filter((e) => e.event === "form_abandoned");
     expect(abandonedEvents).toHaveLength(0);
 
     preset.tracker!.destroy();
@@ -248,9 +238,7 @@ describe("hubspotForms", () => {
 
     form.dispatchEvent(new Event("focusin", { bubbles: true }));
 
-    const countAfter = emitted.filter(
-      (e) => e.event === "form_started",
-    ).length;
+    const countAfter = emitted.filter((e) => e.event === "form_started").length;
     expect(countAfter).toBe(countBefore);
 
     preset.tracker!.destroy();
@@ -270,9 +258,7 @@ describe("hubspotForms", () => {
     });
     await new Promise((r) => setTimeout(r, 0));
 
-    const submittedEvents = emitted.filter(
-      (e) => e.event === "form_submitted",
-    );
+    const submittedEvents = emitted.filter((e) => e.event === "form_submitted");
     expect(submittedEvents).toHaveLength(0);
   });
 
