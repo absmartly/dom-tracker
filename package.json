@@ -43,6 +43,36 @@
       "import": "./es/trackers/session.js",
       "require": "./lib/trackers/session.js"
     },
+    "./trackers/rage-clicks": {
+      "source": "./src/trackers/rage-clicks.ts",
+      "types": "./types/trackers/rage-clicks.d.ts",
+      "import": "./es/trackers/rage-clicks.js",
+      "require": "./lib/trackers/rage-clicks.js"
+    },
+    "./trackers/dead-clicks": {
+      "source": "./src/trackers/dead-clicks.ts",
+      "types": "./types/trackers/dead-clicks.d.ts",
+      "import": "./es/trackers/dead-clicks.js",
+      "require": "./lib/trackers/dead-clicks.js"
+    },
+    "./trackers/element-visibility": {
+      "source": "./src/trackers/element-visibility.ts",
+      "types": "./types/trackers/element-visibility.d.ts",
+      "import": "./es/trackers/element-visibility.js",
+      "require": "./lib/trackers/element-visibility.js"
+    },
+    "./trackers/outbound-links": {
+      "source": "./src/trackers/outbound-links.ts",
+      "types": "./types/trackers/outbound-links.d.ts",
+      "import": "./es/trackers/outbound-links.js",
+      "require": "./lib/trackers/outbound-links.js"
+    },
+    "./trackers/error-tracking": {
+      "source": "./src/trackers/error-tracking.ts",
+      "types": "./types/trackers/error-tracking.d.ts",
+      "import": "./es/trackers/error-tracking.js",
+      "require": "./lib/trackers/error-tracking.js"
+    },
     "./presets": {
       "source": "./src/presets/index.ts",
       "types": "./types/presets/index.d.ts",
