@@ -343,6 +343,142 @@ sessionTracker({
 - `"referral"` — any other referrer
 - `"direct"` — no referrer
 
+### Rage Clicks
+
+Detects rapid repeated clicks on the same element, which typically indicates user frustration.
+
+**Event:** `rage_click`
+
+| Property | Description |
+|---|---|
+| `element_tag` | HTML tag name of the clicked element |
+| `element_text` | Visible text content (truncated to 100 chars) |
+| `click_count` | Number of clicks that triggered the event |
+| `page_name` | Current page name |
+
+**Config:**
+
+```typescript
+import { rageClicks } from "@absmartly/dom-tracker/trackers/rage-clicks";
+
+rageClicks({
+  threshold: 3,    // clicks required to trigger (default)
+  window: 1000,    // time window in ms (default)
+});
+```
+
+Click counters reset on route change.
+
+### Dead Clicks
+
+Detects clicks on non-interactive elements, indicating broken or confusing UI.
+
+**Event:** `dead_click`
+
+| Property | Description |
+|---|---|
+| `element_tag` | HTML tag name of the clicked element |
+| `element_text` | Visible text content (truncated to 100 chars) |
+| `page_name` | Current page name |
+
+```typescript
+import { deadClicks } from "@absmartly/dom-tracker/trackers/dead-clicks";
+
+deadClicks();
+```
+
+An element is considered interactive if it or any ancestor is: a native interactive tag (`a`, `button`, `input`, `select`, `textarea`, `label`, `summary`, `details`), has an ARIA role (`button`, `link`, `tab`, `menuitem`, etc.), has an `onclick` attribute, has `data-abs-track`, or has `contenteditable`. Events are debounced to one per element per second, with a 500ms delay before the interactivity check runs.
+
+### Element Visibility
+
+Tracks when elements enter the viewport, useful for impression tracking.
+
+**Event:** `element_visible` (or a custom event name per element/rule)
+
+| Property | Description |
+|---|---|
+| `event_name` | Value of `data-abs-visible` or the rule's `event` field |
+| `page_name` | Current page name |
+| `...` | Any additional `data-abs-*` props on the element |
+
+**Two ways to mark elements:**
+
+1. **Data attribute** — add `data-abs-visible="impression_name"` to any element, with optional `data-abs-*` props:
+
+```html
+<div
+  data-abs-visible="hero_banner_seen"
+  data-abs-variant="dark"
+>
+  <!-- ... -->
+</div>
+```
+
+2. **Config rules** — match elements by CSS selector:
+
+```typescript
+import { elementVisibility } from "@absmartly/dom-tracker/trackers/element-visibility";
+
+elementVisibility({
+  threshold: 0.5, // fraction of element that must be visible (default)
+  rules: [
+    { selector: ".pricing-card", event: "pricing_card_seen" },
+    { selector: "#hero-banner", event: "hero_banner_seen" },
+  ],
+});
+```
+
+Each element fires once per page. Seen elements reset on route change.
+
+### Outbound Link Clicks
+
+Tracks clicks on links that navigate to an external hostname.
+
+**Event:** `outbound_click`
+
+| Property | Description |
+|---|---|
+| `url` | Full destination URL |
+| `hostname` | Destination hostname |
+| `link_text` | Anchor text (truncated to 100 chars) |
+| `page_name` | Current page name |
+
+```typescript
+import { outboundLinks } from "@absmartly/dom-tracker/trackers/outbound-links";
+
+outboundLinks();
+```
+
+`mailto:` and `tel:` links are ignored. Detection uses event delegation, so clicks on child elements inside an anchor are captured correctly.
+
+### Error Tracking
+
+Captures unhandled JavaScript errors and promise rejections.
+
+**Event:** `js_error`
+
+| Property | Description |
+|---|---|
+| `message` | Error message |
+| `filename` | Source file URL |
+| `lineno` | Line number |
+| `colno` | Column number |
+| `stack` | Stack trace (truncated to 1000 chars) |
+| `page_name` | Current page name |
+
+**Config:**
+
+```typescript
+import { errorTracker } from "@absmartly/dom-tracker/trackers/error-tracking";
+
+errorTracker({
+  maxErrors: 10,      // max errors captured per page (default)
+  dedupeWindow: 5000, // ms to suppress identical errors (default)
+});
+```
+
+Listens to `window.onerror` and `unhandledrejection`. Identical errors (same message + filename + lineno) are deduplicated within `dedupeWindow`. The per-page error count resets on route change.
+
 ## SPA Support
 
 Enable `spa: true` to automatically detect route changes in single-page applications:
@@ -495,6 +631,11 @@ import { scrollDepth } from "@absmartly/dom-tracker/trackers/scroll";
 import { timeOnPage } from "@absmartly/dom-tracker/trackers/time";
 import { formTracker } from "@absmartly/dom-tracker/trackers/forms";
 import { sessionTracker } from "@absmartly/dom-tracker/trackers/session";
+import { rageClicks } from "@absmartly/dom-tracker/trackers/rage-clicks";
+import { deadClicks } from "@absmartly/dom-tracker/trackers/dead-clicks";
+import { elementVisibility } from "@absmartly/dom-tracker/trackers/element-visibility";
+import { outboundLinks } from "@absmartly/dom-tracker/trackers/outbound-links";
+import { errorTracker } from "@absmartly/dom-tracker/trackers/error-tracking";
 import { definePreset } from "@absmartly/dom-tracker/presets";
 import { hubspotForms } from "@absmartly/dom-tracker/presets/hubspot";
 ```
